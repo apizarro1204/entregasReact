@@ -15,6 +15,7 @@ const ItemListContainer = ({ greeting }) => {
     const { showNotification } = useNotification()
 
     useEffect(() => {
+        console.log(categoryId);
         if(categoryId) document.title = 'Ecommerce: ' + categoryId 
         
         return () => {

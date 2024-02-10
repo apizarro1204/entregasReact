@@ -8,6 +8,7 @@ import CartView from './components/CartView/CartView.jsx'
 import Checkout from './components/Checkout/Checkout.jsx'
 
 
+
 function App() {
   return (
     <div>
