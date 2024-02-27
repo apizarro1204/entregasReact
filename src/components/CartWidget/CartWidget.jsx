@@ -1,14 +1,19 @@
-import reactImg from './assets/react.svg'
+import cart from './assets/cart.svg'
 import { useCart } from '../../context/CartContext'
+import { Link } from "react-router-dom"
 
 const CartWidget = () => {
-    const { totalQuantity } = useCart()
 
-    return (
-        <div>
-            <img src={reactImg}/>
-            {totalQuantity}
+    const { totalQuantity } = useCart()
+    return(
+        
+        <div className={classes.div}>
+            <Link className={classes.button} to="/cart"><img src={cart} alt="" className={classes.cart}/></Link>
+            <b className={classes.items}>{totalQuantity}</b>
+            
         </div>
+        
+
     )
 }
 

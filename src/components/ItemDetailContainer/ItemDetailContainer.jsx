@@ -1,58 +1,49 @@
 import { useState, useEffect } from "react"
-// import { getProductById } from "../../asyncMock"
+import { getProductById } from "../../asyncMock"
+import ItemDetail from "../ItemDetail/ItemDetail.jsx"
 import { useParams } from "react-router-dom"
-import ItemDetail from "../ItemDetail/ItemDetail"
-import { useNotification } from "../../notification/NotificationService"
-import { db } from "../../config/firebaseConfig.js"
+import { db } from '../../config/firebaseConfig.js'
 import { getDoc, doc } from "firebase/firestore"
+import Loading from "../Loading/Loading.jsx"
+import { useToast } from "../../context/ToastContext.jsx"
 
 const ItemDetailContainer = () => {
+    //declaramos variables y parametros mediante url necesarios
+    
+    const [producto, setProducto] = useState([])
     const [loading, setLoading] = useState(true)
-    const [product, setProduct] = useState(null)
 
-    const { productId } = useParams()
-
-    const { showNotification } = useNotification()
+    const { id } = useParams()
 
     useEffect(() => {
-        if(product) document.title = product.name
-        
-        return () => {
-            document.title = 'Ecommerce'
+    
+    const productDocument = doc(db, 'products', id)
+    //Se trae la info de la db
+    getDoc(productDocument)
+    //Se procesa para que sea apta
+    .then(queryDocumentSnapshot => {
+        const info = queryDocumentSnapshot.data()
+        if(info){
+            const productAdapted = {id: queryDocumentSnapshot.id, ...info}
+            setProducto(productAdapted)
+            setLoading(false)
+        }else{
+            setLoading(false)
+            setProducto(null)
         }
     })
-
-    useEffect(() => {
-        setLoading(true)
-
-        const productDocument = doc(db, 'item', productId)
-
-        getDoc(productDocument)
-            .then(queryDocumentSnapshot => {
-                const fields = queryDocumentSnapshot.data()
-                const productAdapted = { id: queryDocumentSnapshot.id, ...fields}
-                setProduct(productAdapted)
-            })
-            .catch(error => {
-                showNotification('error', 'Hubo un error')
-            })
-            .finally(() => {
-                setLoading(false)
-            })
-    }, [productId])
-
-    if(loading) {
-        return <h1>Cargando el producto...</h1>
+    .catch(error => {
+        console.error("Error fetching document:", error);
+        setLoading(false);
+    });
+    //Se setea loading a false
+    
     }
-
-    if(!product) {
-        return <h1>El producto no existe</h1>
-    }
-    return (
-        <div>
-            <h1>Detalle</h1>
-            <ItemDetail {...product} />
-            <div></div>
+    , [id])
+    return(
+        <div className={classes.itemDetailContainer}>
+            <Loading loading={loading}/>
+            <ItemDetail producto={producto}/>
         </div>
     )
 }

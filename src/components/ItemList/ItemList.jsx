@@ -1,16 +1,12 @@
-import Item from "../Item/Item"
+import Item from "../Item/Item.jsx"
 
-const ItemList = ({ products }) => {
+const ItemList = ({productos}) => {
     return(
-        <div >
-            {
-                products.map(product => {
-                    return (
-                        <Item key={product.id} {...product}/>
-                    )
-                })
-            }
-        </div> 
+        <div className={classes.itemList}>
+            {productos.map(producto => 
+            <Item key={producto.id} producto = {producto}/>
+            )}
+        </div>
     )
 }
 

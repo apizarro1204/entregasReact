@@ -1,34 +1,50 @@
-import { Link } from "react-router-dom"
 import { useCart } from "../../context/CartContext"
+import { Link } from "react-router-dom"
+import CartItem from "../CartItem/CartItem.jsx"
+import LeyendaCartView from '../LeyendaCartView/LeyendaCartView.jsx'
+
 
 const CartView = () => {
 
-    const { cart, total, removeItem } = useCart()
+    const { cart } = useCart()
+    const { total } = useCart()
+    const { removeItemFromCart } = useCart()
 
-    return (
+    return(
         <>
-            <h1>CART</h1>
-            <section>
-            {
-                cart.map(prod => {
-                    return (
-                        <div key={prod.id} style={{ width: '100%', display: "flex", justifyContent: 'space-around'}}>
-                            <h3>{prod.name}</h3>
-                            <h4>Cantidad: {prod.quantity}</h4>
-                            <h4>Precio por unidad: ${prod.price}</h4>
-                            <h4>Subtotal: ${prod.quantity * prod.price}</h4>
-                            <button onClick={() => removeItem(prod.id)}>Remover</button>
-                        </div>
-                    )
-                })
-            }
+        <div className={classes.cartView}>
+            <section className={classes.products}>
+                <LeyendaCartView/>
+                <div>
+                    {cart.map((prod) => {
+                        return(
+                        <CartItem key={prod.id} producto={prod} onRemove={removeItemFromCart}/>
+                        )
+                    })}
+                </div>
             </section>
-            <section>
-                <h1>Total: ${total}</h1>
+            <section className={classes.resumen}>
+                <h2 className={classes.h2_resumen}>Resumen</h2>
+                <div className={classes.subtotal_total}>
+                    <p>Productos: </p>
+                    <p>${total}</p>
+                </div>
+                
+                <div className={classes.subtotal_total}>
+                    <p>Envio:</p>
+                    <p>$1500</p>
+                </div>
+                <div className={classes.subtotal_total}>
+                    <b>Total:</b>
+                    <b>${total + 1500}</b>
+                </div>
+                <Link to="/checkout" className={classes.button}>
+                    Checkout
+                </Link>
             </section>
-            <section>
-                <Link to='/checkout'>Checkout</Link>
-            </section>
+            
+        </div>
+        
         </>
     )
 }

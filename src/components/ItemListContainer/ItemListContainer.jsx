@@ -1,62 +1,47 @@
 import { useState, useEffect } from "react"
-// import { getProducts, getProductsByCategory } from "../../asyncMock"
-import ItemList from "../ItemList/ItemList"
+import { getProducts, getProductsByCategory } from "../../asyncMock.js"
+import ItemList from "../ItemList/ItemList.jsx"
 import { useParams } from "react-router-dom"
-import { useNotification } from "../../notification/NotificationService"
-import { db } from "../../config/firebaseConfig.js"
-import { getDocs, collection, query, where } from "firebase/firestore"
+import { db } from '../../config/firebaseConfig.js'
+import { getDocs, collection, query, where } from 'firebase/firestore'
+import Loading from '../Loading/Loading.jsx'
 
-const ItemListContainer = ({ greeting }) => {
+
+const ItemListContainer = (props) => {
+    //Se declaran las variables necesarias y se recoje el parametro enviado mediante la url
+    const [productos, setProductos] = useState([])
     const [loading, setLoading] = useState(true)
-    const [products, setProducts] = useState([])
-
-    const { categoryId } = useParams()
-
-    const { showNotification } = useNotification()
+    const { categoria } = useParams()
 
     useEffect(() => {
-        console.log(categoryId);
-        if(categoryId) document.title = 'Ecommerce: ' + categoryId 
+        // Dependiendo si hay categoria o no se guarda una coleccion distina
+        const productsCollection = categoria 
+        ?query(collection(db, 'products'), where('tipoBebida', '==', categoria)) 
+        :collection(db, 'products')
         
-        return () => {
-            document.title = 'Ecommerce'
-        }
-    })
-
-    useEffect(() => {
-        setLoading(true)
-        
-        const productsCollection = categoryId 
-            ? query(collection(db, 'item'), where('category', '==', categoryId))
-            : collection(db, 'item')
-
+        //Se trae la info de firebase
+        console.log("consulta hecha")
         getDocs(productsCollection)
-            .then(querySnapshot => {
-                const productsAdapted = querySnapshot.docs.map(doc => {
-                    const fields = doc.data()
-                    return { id: doc.id, ...fields}
-                })
-
-                setProducts(productsAdapted)
+        //Se procesa esa informacion para adaptarla a lo requerido
+        .then(querySnapshot => {
+            const productsAdapted = querySnapshot.docs.map(doc => {
+                const infoProd = doc.data() 
+                return{id: doc.id, ...infoProd}
             })
-            .catch(error => {
-                showNotification('error', 'Hubo un error')
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+            setProductos(productsAdapted)
+        })
+        .catch(err => {console.error(err)
+            setLoading(false)})
 
-    }, [categoryId])
-
-    if(loading) {
-        return <h1>Cargando los productos...</h1>
-    }
-
-    return (
-        <div>
-            <h1>{greeting + (categoryId ?? '')}</h1>
-            <ItemList products={products}/>
+        //Seteamos loading a false para dejar de ver el mensaje
+        setLoading(false)}, [categoria])
+        
+    return(
+        <div className={classes.itemListContainer}>
+            <Loading loading={loading}/>
+            <ItemList productos = {productos}/>
         </div>
+        
     )
 }
 

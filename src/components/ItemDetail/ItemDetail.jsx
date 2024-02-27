@@ -1,47 +1,33 @@
-import { Link } from 'react-router-dom'
-import ItemCount from '../ItemCount/ItemCount'
-import { useCart } from '../../context/CartContext'
-import { useNotification } from '../../notification/NotificationService'
+import { useState } from "react"
+import ItemCount from "../ItemCount/ItemCount.jsx"
+import { useCart } from "../../context/CartContext.jsx"
 
-const ItemDetail = ({ id, name, category, img, price, stock, description }) => {
-    const { addItem, getProductQuantity } = useCart()
-    const { showNotification } = useNotification()
-
-    const handleOnAdd = (quantity) => {
-        const objProductToAdd = {
-            id, name, price, quantity
-        }
-        addItem(objProductToAdd)
-        showNotification('info', `Se agregaron correctamente ${quantity} ${name}`)
+const ItemDetail = ({producto}) => {
+    if(!producto){
+        return(
+            <h1>El producto no existe</h1>
+        )
     }
-
-    const productQuantity = getProductQuantity(id)
-
-    return (
-        <article>
-            <header>
-                <h2>
-                    {name}
-                </h2>
-            </header>
-            <picture>
-                <img src={img} alt={name} style={{ width: 200}}/>
-            </picture>
-            <section>
-                <p>
-                    Categoria: {category}
-                </p>
-                <p>
-                    Descripción: {description}
-                </p>
-                <p>
-                    Precio: {price}
-                </p>
-            </section>           
-            <footer>
-                <ItemCount onAdd={handleOnAdd} stock={stock} initial={productQuantity}/>
-            </footer>
-        </article>
+    const [quantity, setQuantity] = useState(0)
+    console.log(producto)
+    
+    const { addItemToCart } = useCart()
+    return(
+        <div className={classes.itemDetail}>
+            
+            <img src={import.meta.env.BASE_URL + producto.src} alt="" />
+            <div className={classes.divRightColumn}>
+                <div className={classes.descripcionDiv}>
+                    <h2>{producto.tipoBebida} {producto.variedad} {producto.marca} {producto.contenido}</h2>
+                    <b className={classes.precio}>${producto.precio}</b>
+                    <div>
+                        <p>{producto.descripcion}</p>
+                        <p>Contiene una graduacion alcoholica de {producto.graduacion}</p>
+                    </div>
+                </div>
+                    <ItemCount initial={1} stock={producto.stock} onAdd={addItemToCart} producto={producto}/>
+            </div>
+        </div>
     )
 }
 

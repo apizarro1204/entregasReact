@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom"
 
-const Item = ({ id, name, img, category, price}) => {
-    console.log('render de item: ', id)
-    return (
-        <div>
-            <h3>{name}</h3>
-            <img src={img} style={{ width: 150 }}/>
-            <p>Categoria: {category}</p>
-            <h4>${price}</h4>
-            <Link to={`/detail/${id}`}>Ver detalle</Link>
-        </div>  
+const Item = ({producto}) => {
+    return(
+            <Link to={`/item/${producto.id}`} className={classes.link}>
+                <img src={import.meta.env.BASE_URL + producto.src} className={classes.img}/>
+                <h3 className={classes.p}>{producto.tipoBebida} {producto.variedad} {producto.marca} {producto.contenido}</h3>
+                <b className={classes.b}>${producto.precio}</b>
+            </Link>
     )
 }
 
